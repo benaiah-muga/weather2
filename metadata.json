@@ -1,0 +1,7 @@
+{
+  "name": "Stunning Weather App",
+  "description": "A visually stunning weather application providing real-time weather data and forecasts with a native mobile experience, dynamically changing its theme based on the current conditions.",
+  "requestFramePermissions": [
+    "geolocation"
+  ]
+}
