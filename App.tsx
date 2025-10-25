@@ -8,6 +8,8 @@ import { SettingsScreen } from './screens/SettingsScreen';
 import type { WeatherData, ForecastData, Units } from './types';
 import { weatherService } from './services/weatherService';
 
+type PermissionStatus = 'granted' | 'denied' | 'prompt';
+
 const App: React.FC = () => {
     const [weather, setWeather] = useState<WeatherData | null>(null);
     const [forecast, setForecast] = useState<ForecastData | null>(null);
@@ -18,6 +20,8 @@ const App: React.FC = () => {
     const [lastUpdated, setLastUpdated] = useState<string>('');
     const [activeTab, setActiveTab] = useState<string>('weather');
     const [units, setUnits] = useState<Units>('metric');
+    const [permissionStatus, setPermissionStatus] = useState<PermissionStatus>('prompt');
+
 
     const fetchWeatherData = useCallback(async (searchCity: string, currentUnits: Units, isRefresh = false) => {
         if (!isRefresh) setLoading(true);
@@ -74,6 +78,17 @@ const App: React.FC = () => {
     }, []);
 
     useEffect(() => {
+        // Handle Geolocation permission status
+        if (navigator.permissions) {
+            navigator.permissions.query({ name: 'geolocation' }).then((permission) => {
+                setPermissionStatus(permission.state as PermissionStatus);
+                permission.onchange = () => {
+                    setPermissionStatus(permission.state as PermissionStatus);
+                };
+            });
+        }
+
+        // Fetch initial weather data
         navigator.geolocation.getCurrentPosition(
             (position) => {
                 const { latitude, longitude } = position.coords;
@@ -160,7 +175,7 @@ const App: React.FC = () => {
             case 'forecast':
                 return <ForecastScreen forecast={forecast} units={units} />;
             case 'settings':
-                return <SettingsScreen currentUnits={units} onUnitsChange={handleUnitsChange} />;
+                return <SettingsScreen currentUnits={units} onUnitsChange={handleUnitsChange} permissionStatus={permissionStatus} />;
             default:
                 return null;
         }

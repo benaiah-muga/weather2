@@ -1,13 +1,33 @@
 
 import React from 'react';
 import type { Units } from '../types';
+import { LocationMarkerIcon, TrashIcon } from '../components/icons';
+
+type PermissionStatus = 'granted' | 'denied' | 'prompt';
 
 interface SettingsScreenProps {
     currentUnits: Units;
     onUnitsChange: (units: Units) => void;
+    permissionStatus: PermissionStatus;
 }
 
-export const SettingsScreen: React.FC<SettingsScreenProps> = ({ currentUnits, onUnitsChange }) => {
+export const SettingsScreen: React.FC<SettingsScreenProps> = ({ currentUnits, onUnitsChange, permissionStatus }) => {
+    
+    const handleClearCache = () => {
+        // In a real app, this would clear localStorage, sessionStorage, or other caches.
+        alert('Cached data has been cleared!');
+    };
+
+    const getLocationStatusText = () => {
+        switch(permissionStatus) {
+            case 'granted': return { text: 'Active', color: 'text-green-400' };
+            case 'denied': return { text: 'Denied', color: 'text-red-400' };
+            case 'prompt': return { text: 'Ask on next use', color: 'text-yellow-400' };
+            default: return { text: 'Unknown', color: 'text-white/70' };
+        }
+    };
+    const locationStatus = getLocationStatusText();
+
     return (
         <div className="flex flex-col gap-6 animate-[fade-in_0.5s_ease-in-out]">
             <h1 className="text-3xl font-bold text-center mb-2">Settings</h1>
@@ -39,12 +59,31 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({ currentUnits, on
                 </div>
             </div>
 
+            {/* Data & Privacy Section */}
+            <div className="p-6 bg-black/20 backdrop-blur-sm rounded-2xl shadow-lg">
+                 <h2 className="text-sm font-semibold text-white/70 mb-4 uppercase tracking-wider">Data &amp; Privacy</h2>
+                 <div className="flex items-center justify-between text-lg mb-4">
+                    <div className="flex items-center gap-3">
+                        <LocationMarkerIcon className="h-6 w-6 text-white/80" />
+                        <span>Location Services</span>
+                    </div>
+                    <span className={`font-semibold capitalize ${locationStatus.color}`}>{locationStatus.text}</span>
+                 </div>
+                 <div className="w-full h-[1px] bg-white/20 my-4" />
+                 <button onClick={handleClearCache} className="flex items-center justify-between text-lg w-full text-red-400 hover:text-red-300 transition-colors">
+                    <div className="flex items-center gap-3">
+                         <TrashIcon className="h-6 w-6" />
+                        <span>Clear Cached Data</span>
+                    </div>
+                 </button>
+            </div>
+
             {/* About Section */}
             <div className="p-6 bg-black/20 backdrop-blur-sm rounded-2xl shadow-lg">
                 <h2 className="text-sm font-semibold text-white/70 mb-4 uppercase tracking-wider">About</h2>
                 <div className="flex items-center justify-between text-lg">
                     <span>App Version</span>
-                    <span className="text-white/80">1.1.0</span>
+                    <span className="text-white/80">1.2.0</span>
                 </div>
                 <div className="w-full h-[1px] bg-white/20 my-4" />
                 <div className="flex items-center justify-between text-lg">
